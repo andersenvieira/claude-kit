@@ -4,6 +4,11 @@ Você (a IA) está lendo este arquivo porque alguém disse algo como "aplique o 
 repositório>". Este arquivo é o manual completo: siga-o na ordem, sem pular etapas, e sem inventar
 método diferente do que está escrito aqui.
 
+**De onde vêm os arquivos**: todo caminho citado aqui (ex.: `nucleo/CLAUDE.md`) se lê em
+`https://raw.githubusercontent.com/andersenvieira/claude-kit/main/<caminho>`. Repositório:
+`https://github.com/andersenvieira/claude-kit` (atalho: `undersec.com.br/kit`). Versão antiga:
+troque `main` pela tag (`v1`, `v2`…).
+
 ## 1. Descubra onde você está rodando
 
 - **Claude Code em Linux/macOS**: pasta de configuração é `~/.claude`.
