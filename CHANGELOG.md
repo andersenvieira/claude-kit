@@ -3,8 +3,8 @@
 ## v1.2 — 2026-10-21
 `commands/kit-enviar.md`: passo 1 passa a cobrir a máquina sem clone local do kit — clona com
 `gh repo clone <conta>/claude-kit` (conta inferida do endereço de onde o kit foi aplicado) antes do
-`git pull`; a condição de parada do passo final ("sem gh/git configurado...") passa a cobrir também
-falta de clone, não só falta de permissão de push.
+`git pull`; a condição de parada do passo final deixa de ser "sem clone" e passa a ser "sem
+`gh`/`git` configurado ou sem permissão de push".
 Peso aproximado em tokens: núcleo sempre carregado (`nucleo/CLAUDE.md`) ~1.919 tokens
 (7.676 caracteres ÷ 4); repositório completo ~21.627 tokens (86.508 caracteres ÷ 4).
 
