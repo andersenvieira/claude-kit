@@ -33,7 +33,9 @@ Se não tiver certeza de qual ambiente é, pergunte antes de criar qualquer arqu
   Nunca sobrescreva sem backup.
 - **Nunca toque na seção "Regras desta máquina"** (ou equivalente) que já exista no `CLAUDE.md` do
   usuário. Essa seção é local, não vem deste kit. Se o `CLAUDE.md` atual tiver essa seção, preserve-a
-  integralmente ao mesclar o conteúdo de `nucleo/CLAUDE.md`.
+  integralmente ao mesclar o conteúdo de `nucleo/CLAUDE.md`. Isso inclui **não acrescentar** nada
+  nela, nem criar essa seção se ela não existir. Decisões da instalação (ex.: bypass recusado,
+  módulo não instalado) vão só no resumo final para o usuário, nunca no `CLAUDE.md`.
 - **Bypass de permissão só com ok explícito do usuário.** Ver `settings.md` para as regras de
   mesclagem do `settings.json`.
 - **Hook novo ou hook que mudaria de conteúdo: só com ok do usuário, mostrando o nome do hook antes

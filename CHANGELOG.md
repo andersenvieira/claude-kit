@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v1.1 — 2026-10-21
+`LEIA-PRIMEIRO.md`: a IA não acrescenta nada à seção "Regras desta máquina" nem a cria quando não
+existe; decisões da instalação ficam só no resumo final. (Teste real da T4: a IA registrava "bypass
+não ligado" dentro da seção.)
+
 ## v1 — 2026-10-21
 Primeira versão pública do kit: núcleo (`CLAUDE.md` genérico + preferências para claude.ai), skills
 (brainstorm, debug, executar, engenharia-segura, pentest-professor), agentes (explorador,
