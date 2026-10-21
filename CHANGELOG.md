@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## v1.5 — 2026-10-21
+§8 Memória: índice `MEMORY.md` ≤4k caracteres, agrupado; históricas em `memory/arquivo/` + `LEIA.md`; conferir órfãs.
+
 ## v1.4 — 2026-10-21
 Módulo `raycast` preenchido (antes só esqueleto): atalhos de estudo de pentest para Raycast (Windows)
 e Ulauncher (Linux), com os mesmos comandos em `.ps1` e `.sh`.

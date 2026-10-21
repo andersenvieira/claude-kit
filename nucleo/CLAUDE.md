@@ -121,6 +121,9 @@ Regras de cada produto/projeto ficam em `docs/REGRAS_PRODUTO.md` (ou `docs/FICHA
 do próprio projeto — ler antes de mexer nele. A memória automática do Claude Code guarda só lição
 durável e de conduta (preferência do usuário, correção que ele fez), não estado de projeto — estado
 fica no ESTADO_*.md.
+Índice `MEMORY.md` ≤4k caracteres (`wc -c` a cada memória nova): uma linha curta por memória, agrupada
+(Conduta / Máquina / Produtos); memória histórica ou revogada vai para `memory/arquivo/` com uma linha
+em `arquivo/LEIA.md`, nunca fica no índice. Memória sem linha no índice não é vista: conferir órfãs.
 
 ## 9. Manter o kit atualizado
 
