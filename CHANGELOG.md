@@ -1,0 +1,13 @@
+# CHANGELOG
+
+## v1 — 2026-10-21
+Primeira versão pública do kit: núcleo (`CLAUDE.md` genérico + preferências para claude.ai), skills
+(brainstorm, debug, executar, engenharia-segura, pentest-professor), agentes (explorador,
+implementador, mecanico), comandos (economia, kit-enviar), hooks opcionais em Python (aviso-risco,
+fiscal-economia, titulo-conversa, comando-ditado) + `bin/mapa.py`, regras de mesclagem de
+`settings.json` (`settings.md`), módulo `vps` (inativo até detecção/pedido) e esqueleto do módulo
+`raycast` (a completar).
+Peso aproximado em tokens: núcleo sempre carregado (`nucleo/CLAUDE.md`) ~1.919 tokens
+(7.676 caracteres ÷ 4); repositório completo ~37.798 tokens (151.193 caracteres ÷ 4).
+Pendência para a tarefa 2: hooks e `bin/mapa.py` ainda são só para Linux/macOS com Python 3 — a
+conversão multiplataforma (Windows/`py`, sem shell fixo) é a próxima tarefa do plano.
