@@ -1,12 +1,12 @@
 # CHANGELOG
 
 ## v1.3 — 2026-10-21
-`bin/mapa.py`: comandos `frentes` (abertos agrupados por projeto). `marcar <ESTADO_X> <status>`
-(troca o status no cabeçalho) e `abertura` (bloco curto de retomada. até 1.200 caracteres: prioridade 1
-e urgência alta primeiro. depois os mais recentes); status novo `pausado`; `checar` avisa quando há
+`bin/mapa.py`: comandos `frentes` (abertos agrupados por projeto), `marcar <ESTADO_X> <status>`
+(troca o status no cabeçalho) e `abertura` (bloco curto de retomada, até 1.200 caracteres: prioridade 1
+e urgência alta primeiro, depois os mais recentes); status novo `pausado`; `checar` avisa quando há
 mais de 5 abertos.
 `hooks/fiscal-economia.py`: na pasta genérica o início de sessão mostra só o bloco curto do
-`mapa.py abertura`; alerta quando o modelo da sessão troca sem o usuário pedir (no `opusplan`. a troca
+`mapa.py abertura`; alerta quando o modelo da sessão troca sem o usuário pedir (no `opusplan`, a troca
 Opus↔Sonnet é normal e não alerta); o medidor mostra a família do modelo.
 Peso aproximado em tokens: núcleo ~1.919; repositório completo ~22.843 (91.374 caracteres ÷ 4).
 
