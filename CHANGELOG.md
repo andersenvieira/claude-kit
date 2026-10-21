@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## v1.4 — 2026-10-21
+Módulo `raycast` preenchido (antes só esqueleto): atalhos de estudo de pentest para Raycast (Windows)
+e Ulauncher (Linux), com os mesmos comandos em `.ps1` e `.sh`.
+`modulos/raycast/AULA.md`: aula que mapeia os atalhos que o usuário já tem (sub-rede, dispositivos,
+ping, testar-porta, meus-ips, status-vpn) às fases de recon/enumeração, com boas práticas e aviso de
+escopo. `modulos/raycast/scripts/`: `desec-abrir` (abre a academia), `desec-2fa` (TOTP lido do cofre
+do sistema — SecretManagement/secret-tool —, mostra e copia; função TOTP pura no Windows), `desec-vpn`
+(liga a VPN do lab, modo `wsl` padrão ou `kali` por SSH, flag de instalar; mostra o comando e confirma
+antes do sudo), `desec-nota` (cria nota no Obsidian pelo modelo). `modulos/raycast/modelos/relatorio-pentest.md`:
+template de relatório. Semente 2FA e `.ovpn` nunca entram no kit — ficam no cofre do sistema e em `~/desec/`.
+Peso aproximado em tokens: repositório completo ~28.808 (115.234 caracteres ÷ 4).
+
 ## v1.3 — 2026-10-21
 `bin/mapa.py`: comandos `frentes` (abertos agrupados por projeto), `marcar <ESTADO_X> <status>`
 (troca o status no cabeçalho) e `abertura` (bloco curto de retomada, até 1.200 caracteres: prioridade 1
