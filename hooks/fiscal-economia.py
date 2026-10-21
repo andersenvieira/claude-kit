@@ -124,6 +124,18 @@ def inicio_de_sessao(dados):
     generico = pasta_generica(cwd)
     todos = arquivos_de_retomada(cwd)
     retomada = todos[:5]
+    if generico and len(retomada) > 1:
+        # Pasta genérica: só o bloco curto do mapa (teto 1.200 caracteres), não a lista inteira.
+        try:
+            bloco = subprocess.run([sys.executable, str(Path.home() / ".claude/bin/mapa.py"), "abertura"],
+                                   capture_output=True, text=True, timeout=5).stdout.strip()
+        except OSError:
+            bloco = ""
+        if bloco:
+            responder("SessionStart", bloco + "\nPedido claro: leia o ESTADO dele (caminho acima ou "
+                      "`mapa.py busca <termo>`). Só \"continuar\": mostre a lista numerada (data + título em "
+                      "palavras comuns + última ação, sem nome de arquivo) e pergunte o número. LONGO = enxugar.")
+            return
     if retomada:
         linhas = []
         for p in retomada:
@@ -195,12 +207,16 @@ def inicio_de_sessao(dados):
 
 
 def medir(transcript):
-    """Contexto = entrada total (nova + cache) da última resposta da conversa principal."""
+    """Contexto = entrada total (nova + cache) da última resposta da conversa principal.
+    Modelo: o esperado é o da primeira resposta depois do último /model; o atual, o da última."""
     ctx = imagens = 0
+    esperado = atual = None
     try:
         with open(transcript, encoding="utf-8", errors="ignore") as f:
             for linha in f:
                 imagens += linha.count('"type":"image"') + linha.count('"type": "image"')
+                if "<command-name>/model</command-name>" in linha:
+                    esperado = None  # troca pedida pelo usuário: vale o que vier depois
                 if '"usage"' not in linha:
                     continue
                 try:
@@ -214,9 +230,28 @@ def medir(transcript):
                          + u.get("cache_creation_input_tokens", 0))
                 if total:
                     ctx = total
+                modelo = (msg.get("message") or {}).get("model") or ""
+                if modelo and not modelo.startswith("<"):
+                    esperado, atual = esperado or modelo, modelo
     except OSError:
         pass
-    return {"ctx_k": ctx / 1000, "imagens": imagens}
+    return {"ctx_k": ctx / 1000, "imagens": imagens, "esperado": esperado, "atual": atual}
+
+
+def familia(modelo):
+    return next((f for f in ("opus", "fable", "sonnet", "haiku") if f in (modelo or "")), modelo)
+
+
+def caiu_de_modelo(m):
+    """Troca que o usuário não pediu. No opusplan, opus<->sonnet é o normal."""
+    de, para = familia(m["esperado"]), familia(m["atual"])
+    if not de or not para or m["esperado"] == m["atual"]:
+        return False
+    try:
+        cfg = json.loads((Path.home() / ".claude/settings.json").read_text()).get("model", "")
+    except Exception:
+        cfg = ""
+    return not ("opusplan" in cfg and {de, para} <= {"opus", "sonnet"})
 
 
 def passou(medida, limite):
@@ -256,13 +291,21 @@ def a_cada_mensagem(dados):
 
     uso = uso_da_conta()
     acao = "" if not aviso else " 🔴/clear"
-    medidor = f"💬{100 * m['ctx_k'] / ALERTA['ctx_k']:.0f}%"
+    medidor = f"💬{100 * m['ctx_k'] / ALERTA['ctx_k']:.0f}% · {familia(m['atual']) or '?'}"
     if uso:
         medidor += f" · 5h {uso['h5']:.0f}%{delta('h5', uso['h5'])} · sem {uso['sem']:.0f}%{delta('sem', uso['sem'])}"
     medidor += acao
     regra = ("Comece a resposta com esta linha, em texto pequeno (entre crases), sem comentar: "
              f"`{medidor}`") if aviso else ""
     contexto, mensagem = regra, None
+    queda = ""
+    if caiu_de_modelo(m) and visto.get("queda") != m["atual"]:
+        visto["queda"] = m["atual"]
+        queda = (f"🔴 MODELO: a sessão começou em {m['esperado']} e a última resposta veio de {m['atual']} "
+                 "(troca que o usuário não pediu). Comece a resposta com a linha "
+                 f"\"🔴 caiu para {familia(m['atual'])}\". Pedido de código nível 2–3: pause e pergunte ao usuário "
+                 "se segue assim ou espera o modelo voltar; nível 0–1 pode seguir.")
+        mensagem = f"Modelo trocou: {m['esperado']} → {m['atual']}"
     marca.write_text(json.dumps(visto))
 
     if nivel == "aviso":
@@ -285,6 +328,9 @@ def a_cada_mensagem(dados):
         )
         mensagem = f"Fiscal de economia: {resumo}. Está caro — feche o assunto e dê /clear."
 
+    if queda:
+        contexto = queda + ("\n" + contexto if contexto else "")
+        mensagem = mensagem if nivel else f"Modelo trocou: {m['esperado']} → {m['atual']}"
     responder("UserPromptSubmit", contexto, mensagem)
 
 

@@ -4,6 +4,8 @@
   mapa.py                gera ~/docs/MAPA.md
   mapa.py busca <termo>  só as linhas que casam (assunto, projeto, palavra, resumo), até 10
   mapa.py abertos        só o que tem pendência
+  mapa.py frentes        abertos agrupados por projeto, numerados (para triagem)
+  mapa.py marcar <ESTADO_X> <aberto|pausado|fechado|arquivado>   troca o status no cabeçalho
   mapa.py checar         ESTADO sem cabeçalho, >60 linhas, relaciona quebrado
   mapa.py iniciar        põe cabeçalho rascunho nos ESTADO que não têm (não toca nos que têm)
 
@@ -12,7 +14,7 @@ Cabeçalho (primeiras linhas do ESTADO):
 assunto: nome curto
 projeto: FILACARD-V2
 palavras: cartão, uid, passarelli
-status: aberto | fechado | arquivado
+status: aberto | pausado | fechado | arquivado
 relaciona: ESTADO_X, ESTADO_Y
 atualizado: 2026-10-12
 resumo: uma linha
@@ -34,6 +36,7 @@ for _f in (sys.stdin, sys.stdout):
 HOME = Path.home()
 RAIZES = [HOME / "docs", HOME / "dev" / "docs"] + sorted((HOME / "dev").glob("*/docs"))
 SAIDA = HOME / "docs" / "MAPA.md"
+MAX_ATIVOS = 5
 CAMPOS = ["assunto", "projeto", "palavras", "status", "relaciona", "atualizado", "resumo"]
 LIMITE = 60
 
@@ -180,6 +183,67 @@ def abertos():
             print(f"- {d.get('projeto')}/{d.get('assunto')}: {d.get('resumo','')} ({str(r['path']).replace(str(HOME), '~')})")
 
 
+def frentes():
+    abs_ = [r for r in registros() if r["d"] and r["d"].get("status") == "aberto"]
+    abs_.sort(key=lambda r: (r["d"].get("projeto", "?"), -r["path"].stat().st_mtime))
+    pj = None
+    for i, r in enumerate(abs_, 1):
+        d = r["d"]
+        if d.get("projeto") != pj:
+            pj = d.get("projeto")
+            print(f"\n{pj}")
+        dt = datetime.fromtimestamp(r["path"].stat().st_mtime).strftime("%d/%m")
+        print(f"{i:>3}. {dt} {d.get('assunto')} — {d.get('resumo','')} [{r['path'].stem}]")
+    print(f"\n{len(abs_)} abertos (meta ≤{MAX_ATIVOS})")
+
+
+def marcar(nome, status):
+    if status not in ("aberto", "pausado", "fechado", "arquivado"):
+        sys.exit(f"status inválido: {status}")
+    alvo = [r for r in registros() if r["path"].stem == nome.removesuffix(".md")]
+    if len(alvo) != 1:
+        sys.exit(f"{len(alvo)} arquivos com o nome {nome}")
+    p = alvo[0]["path"]
+    _, t, _ = ler(p)
+    novo, n = re.subn(r"(?m)^status:.*$", f"status: {status}", t, count=1)
+    if not n:
+        sys.exit(f"sem campo status: {p}")
+    p.write_text(novo, encoding="utf-8")
+    print(f"{p.stem}: {status}")
+
+
+def abertura(teto=1200):
+    """Bloco curto para o início de sessão: prioridade 1, depois urgência alta, depois os mais recentes."""
+    abs_ = [r for r in registros() if r["d"] and r["d"].get("status") == "aberto"]
+    def chave(r):
+        d = r["d"]
+        return (d.get("prioridade") != "1", d.get("urgencia") != "alta",
+                -r["path"].stat().st_mtime)
+    abs_.sort(key=chave)
+    por_proj = {}
+    for r in abs_:
+        pj = r["d"].get("projeto", "?")
+        por_proj[pj] = por_proj.get(pj, 0) + 1
+    contagem = "Abertos por projeto: " + " · ".join(
+        f"{k} {v}" for k, v in sorted(por_proj.items(), key=lambda kv: -kv[1]))
+    rodape = f"\n{contagem} (total {len(abs_)})\n0. assunto novo · ver 10 · ver 15 · ver todos (`mapa.py abertos`)"
+    itens = abs_[:5]
+    cab = "Retomada (prioridade 1 e urgência alta primeiro; ESTADO = caminho abaixo):"
+    fixo = len(cab) + len(rodape)
+    def item(i, r, corte):
+        d = r["d"]
+        dt = datetime.fromtimestamp(r["path"].stat().st_mtime).strftime("%d/%m")
+        res = d.get("resumo", "")
+        res = res if len(res) <= corte else res[:corte - 1] + "…"
+        longo = " LONGO" if r["linhas"] > LIMITE else ""
+        return f"\n{i}. {dt} {d.get('projeto')}/{d.get('assunto')}: {res} ({str(r['path']).replace(str(HOME), '~')}){longo}"
+    for corte in (110, 90, 70, 50, 30):
+        corpo = "".join(item(i, r, corte) for i, r in enumerate(itens, 1))
+        if fixo + len(corpo) <= teto:
+            break
+    print(cab + corpo + rodape)
+
+
 def checar():
     regs = registros()
     nomes = {r["path"].stem for r in regs}
@@ -197,6 +261,9 @@ def checar():
         for x in lista(d.get("relaciona")):
             if x not in nomes:
                 probs.append(f"relaciona inexistente '{x}': {p}")
+    n_ab = sum(1 for r in regs if r["d"] and r["d"].get("status") == "aberto")
+    if n_ab > MAX_ATIVOS:
+        probs.append(f"{n_ab} abertos (>{MAX_ATIVOS}): pausar com `mapa.py marcar ESTADO_X pausado`")
     print("\n".join(probs) if probs else "0 problemas")
     return len(probs)
 
@@ -207,6 +274,12 @@ if __name__ == "__main__":
         busca(" ".join(sys.argv[2:]))
     elif cmd == "abertos":
         abertos()
+    elif cmd == "frentes":
+        frentes()
+    elif cmd == "marcar" and len(sys.argv) > 3:
+        marcar(sys.argv[2], sys.argv[3])
+    elif cmd == "abertura":
+        abertura()
     elif cmd == "checar":
         sys.exit(1 if checar() else 0)
     elif cmd == "iniciar":
