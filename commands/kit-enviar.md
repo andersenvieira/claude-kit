@@ -5,8 +5,10 @@ Manda de volta para o repositório público do kit uma melhoria feita na config 
 
 Passos:
 
-1. **Pull antes de tudo**: no clone local do repositório do kit, `git pull` — conflito entre máquinas
-   se resolve pelo próprio git, não por esta skill.
+1. **Clone e pull antes de tudo**: procure o clone local do repositório do kit (pasta com `VERSAO`,
+   `LEIA-PRIMEIRO.md` e remoto `claude-kit`). Se não houver, clone numa pasta temporária com
+   `gh repo clone <conta>/claude-kit` (a conta é a do endereço de onde o kit foi aplicado; na dúvida, perguntar). Depois
+   `git pull` — conflito entre máquinas se resolve pelo próprio git, não por esta skill.
 2. **Comparar local × repositório**: para cada arquivo que o kit instalou em `~/.claude/` (ou
    equivalente), olhar a versão atual na máquina contra a versão no clone do repositório. Ignorar
    arquivos que o usuário não tocou.
@@ -23,5 +25,5 @@ Passos:
    mudou.
 8. Reportar ao usuário: versão nova, arquivos mudados, peso em tokens, link do commit.
 
-Sem `gh`/`git` configurado, ou sem clone do repositório na máquina: avisar e parar — não inventar
+Sem `gh`/`git` configurado, ou sem permissão de push no repositório: avisar e parar — não inventar
 outro jeito de publicar.
