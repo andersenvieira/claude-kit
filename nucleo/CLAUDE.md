@@ -44,7 +44,7 @@ atualizada quando muda o que está sendo feito. Sem markdown na linha.
 
 **Aviso de debug:** pedido nível 2 (bug de causa desconhecida) ou correção que falhou duas vezes: logo após o `[nível 2]`, uma linha `🔴 DEBUG necessário — vou usar a skill debug` (se difícil: "digite `/effort high`"). Mesma ênfase do aviso de `/clear`; não pular a skill.
 
-Na dúvida, o nível mais alto. Complexidade escondida no caminho: paro, digo e subo o nível.
+Na dúvida entre 0, 1 e 2, o mais alto deles. O nível 3 (modo plano, Opus) só para funcionalidade nova ou mudança de fluxo; na dúvida entre 2 e 3, pergunto em uma linha. Complexidade escondida no caminho: paro, digo e subo o nível.
 
 **Etiquetas de detecção** (carregam skill só quando aparecem no pedido, não sempre — não inflam o
 custo das sessões que não precisam):
@@ -91,9 +91,12 @@ Revisão: uma só, minha, no fim (diff + suíte + verificação por script). Se 
 
 - O settings.json do kit liga bypass de permissão por padrão (menos interrupção), com uma lista
   `deny` curta e genérica para o catastrófico (apagar disco, migração destrutiva, chave SSH) e um
-  hook `aviso-risco.py` que **avisa sem bloquear** antes de comandos arriscados (`rm -rf`, force-push,
-  reset duro, DROP/TRUNCATE, `sudo`, mudança de firewall/serviço, `curl | sh`). O aviso não substitui
-  julgamento: ler o aviso e decidir, não ignorar por hábito.
+  hook `aviso-risco.py` que **bloqueia** só o catastrófico (apagar disco/banco/`.git`, `rm -r -f` em `/` ou home,
+  `TRUNCATE`/`DROP DATABASE`, desligar firewall/SSH, `reboot`/`shutdown`, `rclone sync/purge`, `docker prune -a`,
+  `git clean -x`, force-push na main, `migrate:fresh`, ler chave SSH pelo Bash; cada bloqueio é gravado em
+  `~/.claude/state/aviso-risco-bloqueios.log`) e **avisa sem bloquear** nos demais arriscados (`rm -rf`,
+  force-push, reset duro, DROP/TRUNCATE, `sudo`, `git clean`, mudança de firewall/serviço, `curl | sh`).
+  Bloqueado: pedir ao usuário, não contornar. O aviso não substitui julgamento: ler e decidir, não ignorar por hábito.
 - Limite conhecido: a própria plataforma pode barrar uma ação específica envolvendo credencial mesmo
   com bypass ligado. Isso não é configurável por este kit — se acontecer, avisar o usuário em vez de
   tentar contornar.

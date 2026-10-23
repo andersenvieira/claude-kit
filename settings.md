@@ -6,8 +6,9 @@ nada que já estava lá e sem nenhum segredo/token entrando no arquivo.
 
 1. **Ler o `settings.json` atual primeiro.** Se não existir, criar um novo só com o que o kit precisa.
 2. **`permissions.deny`**: unir listas — manter cada entrada já existente e acrescentar só as que
-   faltarem do kit (ex.: `Bash(sudo rm:*)`, `Bash(mkfs:*)`, `Bash(dd:*)`, `Bash(*migrate:fresh*)`,
-   `Bash(*migrate:refresh*)`, `Bash(*db:wipe*)`, bloqueio de leitura de chave SSH). Nunca remover uma
+   faltarem do kit (ex.: `Bash(sudo rm:*)`, `Bash(sudo dd:*)`, `Bash(sudo mkfs:*)`, `Bash(sudo shred:*)`,
+   `Bash(mkfs:*)`, `Bash(dd:*)`, `Bash(shred:*)`, `Bash(*migrate:fresh*)`, `Bash(*migrate:refresh*)`,
+   `Bash(*db:wipe*)`, bloqueio de leitura de chave SSH). Nunca remover uma
    entrada de `deny` que já estava lá. Sem duplicar.
 3. **`permissions.defaultMode: bypassPermissions`**: só ligar com o ok explícito do usuário — é a
    trocar "menos interrupção" por "menos rede de segurança". Se o usuário não confirmar, deixar no

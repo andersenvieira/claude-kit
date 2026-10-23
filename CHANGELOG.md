@@ -1,5 +1,26 @@
 # CHANGELOG
 
+## v1.6 — 2026-10-23
+`hooks/aviso-risco.py`: passa a BLOQUEAR (`permissionDecision: deny`) só os catastróficos — `sudo` com
+`dd/mkfs/shred/wipefs`, `rm` recursivo em `/`, `~`, `/home`, `/etc`, `/var`, `/usr`, `/opt` (flags separadas ou
+longas também), `find / -delete`, `chmod -R` aberto na raiz, `migrate:fresh|refresh`, `db:wipe`. Novos avisos:
+`rm -r` com flags separadas, `git clean -f`, `find -delete`, `curl | python`. Demais padrões seguem só avisando.
+`nucleo/CLAUDE.md`: §2 nível 3 só para funcionalidade nova/mudança de fluxo (na dúvida 2×3, pergunta);
+§6 descreve o bloqueio.
+Mais bloqueios: `DROP DATABASE`, `TRUNCATE`, `DELETE` sem `WHERE`, `redis flush`, `crontab -r`, `rm -r -f` em
+`/var/www`, `/var/lib/mysql`, `~/.ssh`, home e `.git`, `ufw disable|reset`, `iptables -F`, desligar o SSH, `passwd -l`,
+`userdel`, `reboot|shutdown|poweroff|halt`, `rclone sync|purge|delete`, `docker system prune -a`, `docker volume rm`,
+`compose down -v`, fork bomb, `chmod|chown -R /`, `mv` de diretório de sistema, `git filter-branch`, `git push --force`
+na main/master, `git clean -x` (apaga ignorados como `.env`) e ler chave/credencial pelo Bash (o `deny Read` não
+cobre `cat`). Só vale na posição de comando: palavra solta em grep/echo/commit não bloqueia. Cada bloqueio vai para
+`~/.claude/state/aviso-risco-bloqueios.log` (segredos mascarados). `ufw status` e `iptables -L` não avisam mais.
+`testes/teste-aviso-risco.sh`: 93 casos (bloqueia / avisa / passa), incluindo falsos positivos e o registro.
+`testes/teste-kit-hooks.py`: 19 casos multiplataforma (cp1252/HOME isolado) integrados ao repositório.
+`hooks/fiscal-economia.py`: cache do medidor OAuth ampliado para 120s e aviso em `stderr` se indisponível.
+`modulos/vps/`: sanitização de saída em `sentinela-vps.py` e regra detalhada de aprovação de `cron`/serviços em `LEIA.md`.
+`settings.md`: incluídos `sudo dd`, `sudo mkfs`, `sudo shred` e `shred` nas sugestões de `deny`.
+Rodar as suítes em `testes/` a cada mudança nos hooks.
+
 ## v1.5 — 2026-10-21
 §8 Memória: índice `MEMORY.md` ≤4k caracteres, agrupado; históricas em `memory/arquivo/` + `LEIA.md`; conferir órfãs.
 

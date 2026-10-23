@@ -35,7 +35,7 @@ ALERTA = {"ctx_k": 100, "imagens": 60}   # já está caro; não emendar nada
 REPETIR_ALERTA_A_CADA_K = 20             # mil tokens de crescimento entre um alerta e outro
 
 ESTADO_DIR = Path.home() / ".claude/fiscal-estado"
-USO_CACHE_S = 15                         # uso (5h/semana) fresco a cada mensagem; 15 s só evita consulta dupla
+USO_CACHE_S = 120                        # uso (5h/semana): 2 min de cache reduz as leituras do token OAuth
 
 
 def uso_da_conta():
@@ -43,23 +43,24 @@ def uso_da_conta():
     cache = ESTADO_DIR / "uso.json"
     import time
     try:
-        c = json.loads(cache.read_text())
+        c = json.loads(cache.read_text(encoding="utf-8"))
         if time.time() - c["t"] < USO_CACHE_S:
             return c
     except Exception:
         pass
     try:
         import urllib.request
-        cred = json.loads((Path.home() / ".claude/.credentials.json").read_text())
+        cred = json.loads((Path.home() / ".claude/.credentials.json").read_text(encoding="utf-8"))
         req = urllib.request.Request("https://api.anthropic.com/api/oauth/usage", headers={
             "Authorization": "Bearer " + cred["claudeAiOauth"]["accessToken"],
             "anthropic-beta": "oauth-2025-04-20"})
         d = json.load(urllib.request.urlopen(req, timeout=3))
         c = {"t": time.time(), "h5": d["five_hour"]["utilization"], "sem": d["seven_day"]["utilization"]}
         ESTADO_DIR.mkdir(parents=True, exist_ok=True)
-        cache.write_text(json.dumps(c))
+        cache.write_text(json.dumps(c), encoding="utf-8")
         return c
     except Exception:
+        print("fiscal-economia: medidor de cota indisponível", file=sys.stderr)
         return None
 
 

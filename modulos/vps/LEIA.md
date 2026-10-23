@@ -19,9 +19,12 @@ Só Linux (servidor): os scripts usam bash, systemd e caminhos Linux. Em Windows
   ambíguo, perguntar antes de editar.
 - Nunca seeder, `migrate:fresh`/`refresh`, `db:wipe`, truncate ou qualquer comando que reinicialize
   dados, em nenhum projeto, sem pedido explícito e sem backup antes.
-- Parar para perguntar só se for ambíguo ou arriscado (apagar dados, produção, dinheiro, segurança,
-  irreversível). Mudança de segurança (firewall, SSH, DNS): fazer backup antes e ter caminho de volta
-  testado.
+- Parar para perguntar só se for ambíguo ou arriscado. Exigem o ok do dono da VPS: editar produção,
+  deploy, trocar senha, apagar/arquivar, criar/alterar/remover agendamento (`crontab`, `/etc/cron*`,
+  `systemd timer` — sempre com backup prévio), parar/reiniciar serviço de produção, firewall/SSH/DNS,
+  dinheiro, irreversível. Livre sem perguntar: leitura (`crontab -l`, `systemctl status`), rodar script
+  manualmente para teste, medição, plano, ESTADO e backup do crontab. Mudança de segurança (firewall,
+  SSH, DNS): fazer backup antes e ter caminho de volta testado.
 
 ## Onde ficam os detalhes sensíveis
 IPs, nomes de serviço, cofre de senhas e chaves não entram neste kit público. Para saber onde fica
